@@ -42,14 +42,13 @@ class Question2:
         fdist.plot(30, cumulative=False)
         plt.show()
 
-    def tf_idf(self, without_sws):
-        # Declare dict to hold tf of each word
+    def tf(self, without_sws):
         tf_dict_local = {}
-
-        document_size = len(without_sws)
 
         # Remove punctuation from the input string
         bag_of_words = [word for word in without_sws if re.match("^\P{P}(?<!-)", word)]
+
+        document_size = len(bag_of_words)
 
         # Get unique words from the string without punctuation
         unique_words = set(bag_of_words)
@@ -61,7 +60,15 @@ class Question2:
         for word in bag_of_words:
             word_count_dict[word] += 1
 
-        return word_count_dict
+        # Calculate the tf of each word and add it to a dictionary
+        for word, count in word_count_dict.items():
+            tf_dict_local[word] = count/float(document_size)
+
+        # return sorted(tf_dict_local.items(), key=lambda x: x[1], reverse=True)
+        return tf_dict_local
+
+    def idf(self):
+        pass
 
     def tf_idf_top10(self, document):
         pass
@@ -75,7 +82,7 @@ lower_tokenized_words = q2.to_lowercase(tokenized_words)
 without_stopwords = q2.remove_stopwords(lower_tokenized_words)
 
 # Remove punctions from the without_stopwords variable
-tf_dict = q2.tf_idf(without_stopwords)
+tf_dict = q2.tf(without_stopwords)
 print(tf_dict)
 
 fdist = q2.fdistribution(without_stopwords)
