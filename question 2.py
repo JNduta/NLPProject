@@ -55,9 +55,13 @@ class Question2:
         unique_words = set(bag_of_words)
 
         # Create dictionary with number of occurences of words in the corpus
+        word_count_dict = dict.fromkeys(unique_words, 0)
 
+        # Iterate through bag of words and record the number of times a word appears
+        for word in bag_of_words:
+            word_count_dict[word] += 1
 
-        return unique_words
+        return word_count_dict
 
     def tf_idf_top10(self, document):
         pass
