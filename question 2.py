@@ -4,6 +4,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 import matplotlib.pyplot as plt
+import regex as re
 
 url = 'https://www.gutenberg.org/files/2701/2701-h/2701-h.htm'
 
@@ -41,10 +42,22 @@ class Question2:
         fdist.plot(30, cumulative=False)
         plt.show()
 
-    def tf_idf(self, document):
+    def tf_idf(self, without_sws):
+        # Declare dict to hold tf of each word
         tf_dict_local = {}
-        document_size = len(document)
 
+        document_size = len(without_sws)
+
+        # Remove punctuation from the input string
+        bag_of_words = [word for word in without_sws if re.match("^\P{P}(?<!-)", word)]
+
+        # Get unique words from the string without punctuation
+        unique_words = set(bag_of_words)
+
+        # Create dictionary with number of occurences of words in the corpus
+
+
+        return unique_words
 
     def tf_idf_top10(self, document):
         pass
@@ -59,5 +72,6 @@ without_stopwords = q2.remove_stopwords(lower_tokenized_words)
 
 # Remove punctions from the without_stopwords variable
 tf_dict = q2.tf_idf(without_stopwords)
+print(tf_dict)
 
 fdist = q2.fdistribution(without_stopwords)
