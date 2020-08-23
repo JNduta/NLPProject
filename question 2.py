@@ -7,6 +7,7 @@ from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 import matplotlib.pyplot as plt
 import regex as re
+from numpy import take
 
 url = 'https://www.gutenberg.org/files/2701/2701-h/2701-h.htm'
 
@@ -74,11 +75,22 @@ class Question2:
         for word, value in documents.items():
             idf_dict_local[word] = math.log(1/float(value))
 
-        return sorted(idf_dict_local.items(), key=lambda x: x[1], reverse=True)
+        # return sorted(idf_dict_local.items(), key=lambda x: x[1], reverse=True)
+        return idf_dict_local
 
+    def tf_idf(self):
+        tf_idf_dict_local = {}
+        for word, value in tf_dict.items():
+            tf_idf_dict_local[word] = tf_dict[word] * idf_dict[word]
+        return tf_idf_dict_local
 
     def tf_idf_top10(self, document):
-        pass
+        # Sort the input dictionary and output as a list
+        sorted_dict = sorted(document.items(), key=lambda x: x[1], reverse=True)
+
+        # Trim the list and convert it back to a dictionary
+        first10vals = dict(sorted_dict[:10])
+        return first10vals
 
 
 q2 = Question2(url)
@@ -92,6 +104,10 @@ without_stopwords = q2.remove_stopwords(lower_tokenized_words)
 tf_dict = q2.tf(without_stopwords)
 
 idf_dict = q2.idf(tf_dict)
-print(idf_dict)
+
+tf_idf_dict = q2.tf_idf()
+
+srtdif = q2.tf_idf_top10(tf_idf_dict)
+print(srtdif)
 
 fdist = q2.fdistribution(without_stopwords)
