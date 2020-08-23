@@ -1,3 +1,5 @@
+import math
+
 import requests
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
@@ -67,8 +69,13 @@ class Question2:
         # return sorted(tf_dict_local.items(), key=lambda x: x[1], reverse=True)
         return tf_dict_local
 
-    def idf(self):
-        pass
+    def idf(self, documents):
+        idf_dict_local = {}
+        for word, value in documents.items():
+            idf_dict_local[word] = math.log(1/float(value))
+
+        return sorted(idf_dict_local.items(), key=lambda x: x[1], reverse=True)
+
 
     def tf_idf_top10(self, document):
         pass
@@ -83,6 +90,8 @@ without_stopwords = q2.remove_stopwords(lower_tokenized_words)
 
 # Remove punctions from the without_stopwords variable
 tf_dict = q2.tf(without_stopwords)
-print(tf_dict)
+
+idf_dict = q2.idf(tf_dict)
+print(idf_dict)
 
 fdist = q2.fdistribution(without_stopwords)
