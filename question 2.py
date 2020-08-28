@@ -9,7 +9,12 @@ import matplotlib.pyplot as plt
 import regex as re
 from numpy import take
 
-url = 'https://www.gutenberg.org/files/2701/2701-h/2701-h.htm'
+document_one = 'https://www.gutenberg.org/files/2701/2701-h/2701-h.htm'  # Moby Dick eBook
+document_two = 'https://www.gutenberg.org/files/768/768-h/768-h.htm'  # Wuthering Heights eBook
+document_three = 'https://en.wikipedia.org/wiki/Titanic'  # Wikipedia article on The Titanic
+document_four = 'https://en.wikipedia.org/wiki/Wanggongchang_Explosion'  # Wikipedia article on the worst
+# accidental explosion in human history
+document_five = 'https://en.wikipedia.org/wiki/September_11_attacks'  # Wikipedia article on the 9/11 attacks
 
 
 class Question2:
@@ -56,7 +61,7 @@ class Question2:
         # Get unique words from the string without punctuation
         unique_words = set(bag_of_words)
 
-        # Create dictionary with number of occurences of words in the corpus
+        # Create dictionary with number of occurrences of words in the corpus
         word_count_dict = dict.fromkeys(unique_words, 0)
 
         # Iterate through bag of words and record the number of times a word appears
@@ -65,23 +70,23 @@ class Question2:
 
         # Calculate the tf of each word and add it to a dictionary
         for word, count in word_count_dict.items():
-            tf_dict_local[word] = count/float(document_size)
+            tf_dict_local[word] = count / float(document_size)
 
-        # return sorted(tf_dict_local.items(), key=lambda x: x[1], reverse=True)
         return tf_dict_local
 
     def idf(self, documents):
-        idf_dict_local = {}
-        for word, value in documents.items():
-            idf_dict_local[word] = math.log(1/float(value))
+        document_size = len(documents)
+        idf_dict = dict.fromkeys(documents[0].keys(), 0)
+        for document in documents:
+            for word, value in document.items():
+                if value > 0:
+                    idf_dict[word] = math.log(document_size / float(value))
+        return idf_dict
 
-        # return sorted(idf_dict_local.items(), key=lambda x: x[1], reverse=True)
-        return idf_dict_local
-
-    def tf_idf(self):
+    def tf_idf(self, tf_dict, idf):
         tf_idf_dict_local = {}
         for word, value in tf_dict.items():
-            tf_idf_dict_local[word] = tf_dict[word] * idf_dict[word]
+            tf_idf_dict_local[word] = tf_dict[word] * idf[word]
         return tf_idf_dict_local
 
     def tf_idf_top10(self, document):
@@ -93,21 +98,61 @@ class Question2:
         return first10vals
 
 
-q2 = Question2(url)
-text = q2.text()
-tokenized_words = q2.tokenize(text)
+# Get document content from the internet using BS4 functions
+document_one_content = Question2(document_one)
+document_two_content = Question2(document_two)
+document_three_content = Question2(document_three)
+document_four_content = Question2(document_four)
+document_five_content = Question2(document_five)
 
-lower_tokenized_words = q2.to_lowercase(tokenized_words)
-without_stopwords = q2.remove_stopwords(lower_tokenized_words)
+# Strip html elements and get the text from each of the documents
+text_document_one = document_one_content.text()
+text_document_two = document_two_content.text()
+text_document_three = document_three_content.text()
+text_document_four = document_four_content.text()
+text_document_five = document_five_content.text()
 
-# Remove punctions from the without_stopwords variable
-tf_dict = q2.tf(without_stopwords)
+# Tokenize each of the documents
+tokenized_document_one = document_one_content.tokenize(text_document_one)
+tokenized_document_two = document_two_content.tokenize(text_document_two)
+tokenized_document_three = document_three_content.tokenize(text_document_three)
+tokenized_document_four = document_four_content.tokenize(text_document_four)
+tokenized_document_five = document_five_content.tokenize(text_document_five)
 
-idf_dict = q2.idf(tf_dict)
+# Convert each of the tokenized documents to lowercase
+lowercase_doc_one = document_one_content.to_lowercase(tokenized_document_one)
+lowercase_doc_two = document_two_content.to_lowercase(tokenized_document_two)
+lowercase_doc_three = document_three_content.to_lowercase(tokenized_document_three)
+lowercase_doc_four = document_four_content.to_lowercase(tokenized_document_four)
+lowercase_doc_five = document_five_content.to_lowercase(tokenized_document_five)
 
-tf_idf_dict = q2.tf_idf()
+# Remove all stopwords from each of the documents
+no_stopwords_doc_one = document_one_content.remove_stopwords(lowercase_doc_one)
+no_stopwords_doc_two = document_two_content.remove_stopwords(lowercase_doc_two)
+no_stopwords_doc_three = document_three_content.remove_stopwords(lowercase_doc_three)
+no_stopwords_doc_four = document_four_content.remove_stopwords(lowercase_doc_four)
+no_stopwords_doc_five = document_five_content.remove_stopwords(lowercase_doc_five)
 
-srtdif = q2.tf_idf_top10(tf_idf_dict)
-print(srtdif)
+# Evaluate the tf of each document
+tf_doc_one = document_one_content.tf(no_stopwords_doc_one)
+tf_doc_two = document_two_content.tf(no_stopwords_doc_two)
+tf_doc_three = document_two_content.tf(no_stopwords_doc_three)
+tf_doc_four = document_two_content.tf(no_stopwords_doc_four)
+tf_doc_five = document_two_content.tf(no_stopwords_doc_five)
 
-fdist = q2.fdistribution(without_stopwords)
+# Evaluate the idf of all documents
+all_documents_idf = document_one_content.idf([tf_doc_one, tf_doc_two, tf_doc_three, tf_doc_four, tf_doc_five])
+
+# Evaluate the tf-idf of each document
+tf_idf_doc_one = document_one_content.tf_idf(tf_doc_one, all_documents_idf)
+tf_idf_doc_two = document_two_content.tf_idf(tf_doc_two, all_documents_idf)
+tf_idf_doc_three = document_three_content.tf_idf(tf_doc_three, all_documents_idf)
+tf_idf_doc_four = document_four_content.tf_idf(tf_doc_four, all_documents_idf)
+tf_idf_doc_five = document_five_content.tf_idf(tf_doc_five, all_documents_idf)
+
+# Output the top 10 elements with the highest tf_idfs
+print(document_one_content.tf_idf_top10(tf_idf_doc_one))
+print(document_two_content.tf_idf_top10(tf_idf_doc_two))
+print(document_three_content.tf_idf_top10(tf_idf_doc_three))
+print(document_four_content.tf_idf_top10(tf_idf_doc_four))
+print(document_five_content.tf_idf_top10(tf_idf_doc_five))
