@@ -1,5 +1,8 @@
 import math
-
+# Scikit Learn
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
@@ -98,6 +101,7 @@ class Question2:
         return first10vals
 
 
+print("Getting content from websites...")
 # Get document content from the internet using BS4 functions
 document_one_content = Question2(document_one)
 document_two_content = Question2(document_two)
@@ -156,3 +160,21 @@ print(document_two_content.tf_idf_top10(tf_idf_doc_two))
 print(document_three_content.tf_idf_top10(tf_idf_doc_three))
 print(document_four_content.tf_idf_top10(tf_idf_doc_four))
 print(document_five_content.tf_idf_top10(tf_idf_doc_five))
+
+#Cosine Similarity
+# Define the documents
+documents = [document_one, document_two, document_three, document_four, document_five]
+# Create the Document Term Matrix
+count_vectorizer = CountVectorizer(stop_words='english')
+count_vectorizer = CountVectorizer()
+sparse_matrix = count_vectorizer.fit_transform(documents)
+
+# OPTIONAL: Convert Sparse Matrix to Pandas Dataframe if you want to see the word frequencies.
+doc_term_matrix = sparse_matrix.todense()
+df = pd.DataFrame(doc_term_matrix,
+                  columns=count_vectorizer.get_feature_names(),
+                  index= [document_one, document_two, document_three, document_four, document_five])
+df
+# Compute Cosine Similarity
+
+print(cosine_similarity(df, df))
